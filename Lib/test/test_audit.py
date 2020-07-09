@@ -115,5 +115,20 @@ class AuditTest(unittest.TestCase):
         self.assertEqual(events[2][0], "socket.bind")
         self.assertTrue(events[2][2].endswith("('127.0.0.1', 8080)"))
 
+    def test_http(self):
+        support.import_module("http.client")
+        returncode, events, stderr = self.run_python("test_http_client")
+        if returncode:
+            self.fail(stderr)
+
+        if support.verbose:
+            print(*events, sep='\n')
+        self.assertEqual(events[0][0], "http.client.connect")
+        self.assertEqual(events[0][2], "www.python.org 80")
+        self.assertEqual(events[1][0], "http.client.send")
+        if events[1][2] != '[cannot send]':
+            self.assertIn('HTTP', events[1][2])
+
+
 if __name__ == "__main__":
     unittest.main()

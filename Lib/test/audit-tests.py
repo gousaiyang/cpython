@@ -323,6 +323,24 @@ def test_socket():
         sock.close()
 
 
+def test_http_client():
+    import http.client
+
+    def hook(event, args):
+        if event.startswith("http.client."):
+            print(event, *args[1:])
+
+    sys.addaudithook(hook)
+
+    conn = http.client.HTTPConnection('www.python.org')
+    try:
+        conn.request('GET', '/')
+    except OSError:
+        print('http.client.send', '[cannot send]')
+    finally:
+        conn.close()
+
+
 if __name__ == "__main__":
     from test.support import suppress_msvcrt_asserts
 
